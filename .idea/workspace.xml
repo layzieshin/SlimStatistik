@@ -4,44 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="41dc77e7-c055-43a5-9d45-d92e9c0abb6a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/SlimStatistik.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SlimStatistik.spec" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/Analysis-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/EXE-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/PKG-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/PYZ-00.pyz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/PYZ-00.toc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/SlimStatistik.pkg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/base_library.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/warn-SlimStatistik.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build/SlimStatistik/xref-SlimStatistik.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/analytes.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/mapping.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/settings.ini" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controller/main_controller.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/SlimStatistik.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dist/config/settings.ini" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lab_data.sqlite" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logic/housekeeping_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logic/stats_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/repository.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/schemas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/style.qss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ui/main_window.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/paths.py" afterDir="false" />
+    <list default="true" id="41dc77e7-c055-43a5-9d45-d92e9c0abb6a" name="Changes" comment="20251015_1">
+      <change afterPath="$PROJECT_DIR$/logic/audit_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/settings.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/main_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/controller/main_controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logic/stats_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/logic/stats_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/style.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/style.qss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main_window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,10 +29,25 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "layzieshin"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/layzieshin/SlimStatistik.git",
+    "accountId": "d6c5f587-079e-411b-9c64-856bacc9c6b6"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="344ezxv7sStRPoGCzDvtHKiR7V0" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -121,15 +107,33 @@
       <option name="presentableId" value="Default" />
       <updated>1760477537518</updated>
     </task>
+    <task id="LOCAL-00001" summary="20251015_1">
+      <option name="closed" value="true" />
+      <created>1760559494900</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1760559494900</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="20251015_1" />
+    <option name="LAST_COMMIT_MESSAGE" value="20251015_1" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/repository.py</url>
-          <line>37</line>
+          <line>36</line>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ui/main_window.py</url>
+          <line>151</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

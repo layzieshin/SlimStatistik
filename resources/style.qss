@@ -1,74 +1,37 @@
-/* ---- Global ---- */
-* { font-family: "Segoe UI", "Noto Sans", "Arial", sans-serif; font-size: 10pt; }
+* { font-family: "Segoe UI","Noto Sans","Arial",sans-serif; font-size: 9pt; }
 QMainWindow { background: #f7f7fb; color: #1a1a1a; }
 QWidget { background: #ffffff; color: #1a1a1a; }
 
-/* ---- Tabs ---- */
-QTabWidget::pane { border: 1px solid #dcdfe6; border-radius: 8px; background: #ffffff; }
-QTabBar::tab { background: #f0f2f5; color: #2c3e50; padding: 6px 12px; border: 1px solid #dcdfe6; border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-right: 6px; }
+QTabWidget::pane { border: 1px solid #dadde5; border-radius: 8px; background: #ffffff; }
+QTabBar::tab { background: #f3f5f8; color: #2c3e50; padding: 5px 10px; border: 1px solid #dadde5; border-bottom: none; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-right: 6px; }
 QTabBar::tab:selected { background: #ffffff; font-weight: 600; }
-QTabBar::tab:hover { background: #e9edf3; }
+QTabBar::tab:hover { background: #eaeef4; }
 
-/* ---- Groups ---- */
-QGroupBox { border: 1px solid #dcdfe6; border-radius: 8px; margin-top: 12px; background: #ffffff; }
+QGroupBox { border: 1px solid #e3e6ee; border-radius: 8px; margin-top: 10px; background: #ffffff; }
 QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 6px; color: #333; font-weight: 600; }
 
-/* ---- Inputs ---- */
-QLineEdit, QComboBox, QDateEdit, QTableWidget {
-  background: #ffffff;
-  border: 1px solid #dcdfe6;
-  border-radius: 6px;
-  padding: 4px 6px;
-  selection-background-color: #e6f0ff;
-  selection-color: #0f172a;
+QLineEdit#analyteSearch { background: #ffffff; border: 1px solid #dcdfe6; border-radius: 6px; padding: 4px 8px; }
+QLineEdit, QDateEdit, QTableWidget, QTableView {
+  background: #ffffff; border: 1px solid #dcdfe6; border-radius: 6px; padding: 3px 6px;
+  selection-background-color: #e6f0ff; selection-color: #0f172a;
 }
-QDateEdit::drop-down, QComboBox::drop-down { border-left: 1px solid #dcdfe6; }
 
-/* ---- Buttons ---- */
-QPushButton {
-  background: #2979ff;
-  color: #ffffff;
-  border: 1px solid #1f6fe5;
-  border-radius: 8px;
-  padding: 6px 10px;
-}
-QPushButton:hover { background: #4c8dff; }
-QPushButton:pressed { background: #1f6fe5; }
+QPushButton { background: #2d6cdf; color: #ffffff; border: 1px solid #235dc5; border-radius: 7px; padding: 5px 9px; }
+QPushButton:hover { background: #4a7fe6; }
+QPushButton:pressed { background: #235dc5; }
 QPushButton:disabled { background: #e5e7eb; color: #9ca3af; border-color: #e5e7eb; }
 
-/* ---- Tables ---- */
-QHeaderView::section {
-  background: #f5f7fa;
-  color: #333;
-  font-weight: 600;
-  padding: 6px;
-  border: 1px solid #e5e7eb;
-}
-QTableWidget {
-  gridline-color: #e5e7eb;
-  selection-background-color: #e6f0ff;
-  selection-color: #0f172a;
-}
+QHeaderView::section { background: #f5f7fa; color: #333; font-weight: 600; padding: 6px; border: 1px solid #e5e7eb; }
+QTableWidget, QTableView { gridline-color: #e5e7eb; selection-background-color: #e6f0ff; selection-color: #0f172a; }
 
-/* ---- Labels & checks ---- */
-QLabel, QCheckBox, QRadioButton { color: #1a1a1a; }
-QCheckBox::indicator { width: 14px; height: 14px; margin-right: 4px; }
-QCheckBox::indicator:checked { background: #2979ff; border: 1px solid #1f6fe5; }
+QCheckBox { spacing: 2px; margin: 0; padding: 0; }
+#analyteCheck { font-size: 8.6pt; margin: 0; padding: 0; min-height: 16px; }
+QCheckBox::indicator { width: 10px; height: 10px; margin-right: 6px; border: 1px solid #cfd5df; border-radius: 2px; background: #fff; }
+QCheckBox::indicator:checked { background: #2d6cdf; border: 1px solid #235dc5; image: none; }
 
-/* ---- Scrollbars ---- */
 QScrollBar:vertical { background: #f5f7fa; width: 12px; }
 QScrollBar::handle:vertical { background: #d1d5db; min-height: 24px; border-radius: 6px; }
 QScrollBar::handle:vertical:hover { background: #c5cbd3; }
 QScrollBar:horizontal { background: #f5f7fa; height: 12px; }
 QScrollBar::handle:horizontal { background: #d1d5db; min-width: 24px; border-radius: 6px; }
 QScrollBar::handle:horizontal:hover { background: #c5cbd3; }
-
-/* ---- Analyt-Chips (optische Begrenzung je Analyt) ---- */
-#analyteChip {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fafafa;
-}
-#analyteChip:hover {
-  background: #f3f4f6;
-}
