@@ -1,0 +1,25 @@
+{
+  "tables": {
+    "header": "Befund",
+    "lines": "Beftag"
+  },
+  "keys": {
+    "sample_id": "ProbenNr"
+  },
+  "header_fields": {
+    "order_timestamp": [
+      "AbnahmeDatum",
+      "TimeStamp",
+      "TransDatum"
+    ],
+    "report_timestamp": [
+      "BefDatum"
+    ]
+  },
+  "line_fields": {
+    "analyte_code": "TestKB",
+    "analyte_name": "LDTName",
+    "result_value": "Ergebnis",
+    "result_timestamp": "ErgbDatum"
+  }
+}

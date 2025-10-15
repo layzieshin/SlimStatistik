@@ -1,0 +1,26 @@
+C3C;Complement C3
+C4C;Complement C4
+CRP;C-reaktives Protein
+FER;Ferritin
+ACCP;Cyclische Citrullinierte Peptide
+RFIGA;Rheumafaktor IgA
+RFIGG;Rheumafaktor IgG
+RFIGM;Rheumafaktor IgM
+ANA;ANA Screen ELISA
+ADNS;dsDNS NcX IgG
+A-PROT;Proteinase 3
+CARDLG;Cardiolipin IgG
+CARDLM;Cardiolipin IgM
+CENPB;AK gegen Zentromerantigene
+ENA;Anti ENA ProfilPlus 1 IgG
+ENAP;Anti ENA PoolPlus 1 IgG
+MPO;Myoloperoxidase IgG
+ENAProfil;Anti-ENA-ProfilPlus1
+BETAG;Anti-B2-Glykoprotein 1 IgG
+BETAM;Anti-B2-Glykoprotein 1 IgM
+nRNP/Sm;nRNP/Sm
+Sm;Sm
+SS-A;SS-A
+SS-B;SS-B
+Scl-70;Scl-70
+Jo-1;Jo-1
