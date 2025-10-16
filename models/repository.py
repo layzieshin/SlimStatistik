@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from typing import List, Tuple, Dict, Optional
+import itertools
 
 
 def _best_effort_decode(b):
@@ -221,32 +222,56 @@ class Repository:
             con.commit()
             return int(c1 + c2)
 
-    # --------- Singlets / Kombinationen
-    def open_combo_stats(self, since: str):
+    # --------- Singlets / Kombinationen (1–4)
+    import itertools
+    # ... Rest unverändert ...
+
+    def open_combo_stats(self, since: str, excluded: Optional[set] = None, max_k: int = 4):
+        """
+        EXAKT-Größen-Logik:
+          - 1er: nur Proben mit GENAU 1 offenem Analyt
+          - 2er/3er/4er: nur Proben mit GENAU 2/3/4 offenen Analyten
+        WICHTIG: 'excluded' wird HIER NICHT angewendet, um die reale offene Matrix
+                 der Probe nicht zu verfälschen (keine Teilmengenbildung).
+        """
         if not self._available():
-            return {}, {}, {}
+            return {}, {}, {}, {}
+
         q = """
         SELECT b.ProbenNr, GROUP_CONCAT(DISTINCT t.TestKB) AS ks
         FROM Befund b
-        JOIN BefTag t ON t.ProbenNr=b.ProbenNr
+        JOIN BefTag t ON t.ProbenNr = b.ProbenNr
         WHERE t.Ergebnis IS NULL
           AND COALESCE(b.AbnahmeDatum, b.TimeStamp) >= ?
         GROUP BY b.ProbenNr
         """
+
         singles: Dict[str, int] = {}
         pairs: Dict[str, int] = {}
         trips: Dict[str, int] = {}
+        quads: Dict[str, int] = {}
+
+        max_k = max(1, min(4, int(max_k)))
+
         with self._conn() as con:
             for r in con.execute(q, (since,)):
-                ks = [k for k in (r["ks"] or "").split(",") if k]
-                ks = sorted(set(ks))
+                raw = (r["ks"] or "")
+                # deduplizieren + sortieren
+                ks = sorted({s.strip() for s in raw.split(",") if s and s.strip()})
                 n = len(ks)
-                if n == 1:
+                if n == 0:
+                    continue
+
+                if n == 1 and max_k >= 1:
                     singles[ks[0]] = singles.get(ks[0], 0) + 1
-                elif n == 2:
+                elif n == 2 and max_k >= 2:
                     key = " + ".join(ks)
                     pairs[key] = pairs.get(key, 0) + 1
-                elif n == 3:
+                elif n == 3 and max_k >= 3:
                     key = " + ".join(ks)
                     trips[key] = trips.get(key, 0) + 1
-        return singles, pairs, trips
+                elif n == 4 and max_k >= 4:
+                    key = " + ".join(ks)
+                    quads[key] = quads.get(key, 0) + 1
+
+        return singles, pairs, trips, quads

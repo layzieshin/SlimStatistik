@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import QApplication
 from controller.main_controller import MainController
 from ui.main_window import MainWindow
 from util.paths import resource_path
+import sys, traceback, os, datetime
+
 
 def main():
     # Konfig extern neben der EXE anlegen/verwenden

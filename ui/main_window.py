@@ -3,13 +3,14 @@ from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QGroupBox, QDateEdit, QTableWidget, QTableWidgetItem, QMessageBox,
     QCheckBox, QTabWidget, QScrollArea, QGridLayout, QFileDialog,
-    QSizePolicy, QLineEdit, QHeaderView, QTableView, QAbstractItemView
+    QSizePolicy, QLineEdit, QHeaderView, QTableView, QAbstractItemView,
+    QSpinBox, QFormLayout
 )
-from PyQt6.QtCore import QDate, QTimer, QEvent, Qt  # <- Qt ergänzt
+from PyQt6.QtCore import QDate, QTimer, QEvent, Qt
 from PyQt6.QtGui import QStandardItemModel, QStandardItem
 import datetime, os, math
 
-from controller.main_controller import MainController   # <- LOGIC!
+from controller.main_controller import MainController   # LOGIC
 from util.paths import resource_path
 
 
@@ -115,18 +116,31 @@ class MainWindow(QMainWindow):
     def _fit_checkbox_wrapper(self, wrapper: QWidget):
         if not hasattr(wrapper, "_scroll"):
             return
+
         scroll = wrapper._scroll
         search = wrapper._search
-        checks = wrapper._checks
-        cols = wrapper._cols
-        show_all = getattr(wrapper, "_show_all", False)
-        cap_ratio = getattr(wrapper, "_cap_ratio", 0.25)
+        checks = list(getattr(wrapper, "_checks", []) or [])
+        cols = int(getattr(wrapper, "_cols", 8))
+        show_all = bool(getattr(wrapper, "_show_all", False))
+        cap_ratio = float(getattr(wrapper, "_cap_ratio", 0.25))
 
-        # sichtbare Elemente bestimmen
-        visible = [cb for cb in checks if cb.isVisible()] or checks
+        # --- WICHTIG: Leere Checkliste robust behandeln ---
+        if not checks:
+            # Nichts zu layouten: kleine, feste Höhe vergeben, damit der Bereich nicht kollabiert.
+            base = search.sizeHint().height()
+            h = max(48, int(self.height() * (0.05 if show_all else cap_ratio)))
+            scroll.setFixedHeight(h)
+            wrapper.setFixedHeight(base + 4 + h)
+            return
+
+        # Wenn der Filter alle ausblendet, nutze die volle Liste als Referenz für die Höhe.
+        visible = [cb for cb in checks if cb.isVisible()]
+        if not visible:
+            visible = checks
+
         row_h = max(18, visible[0].sizeHint().height())
 
-        # Layout/Abstände exakt berücksichtigen
+        # Layout-/Abstandswerte exakt berücksichtigen
         inner = scroll.widget()
         grid = inner.layout()
         m = grid.contentsMargins()
@@ -135,20 +149,19 @@ class MainWindow(QMainWindow):
 
         grid_h = rows * row_h + max(0, rows - 1) * vsp + m.top() + m.bottom()
         frame = scroll.frameWidth() * 2
-        fudge = 10  # kleiner Puffer
+        fudge = 10
         desired_h = grid_h + frame + fudge
 
         if show_all:
             h = desired_h
         else:
-            # auf Anteil der Fensterhöhe begrenzen
             limit = int(self.height() * cap_ratio)
             h = min(desired_h, max(60, limit))
 
         scroll.setFixedHeight(h)
         wrapper.setFixedHeight(search.sizeHint().height() + 4 + h)
 
-    # ---------- Tab: Zählungen (hier: show_all=True -> nichts abgeschnitten)
+    # ---------- Tab: Zählungen (show_all=True -> nichts abgeschnitten)
     def _build_tab_counts(self) -> QWidget:
         w = QWidget()
         layout = QVBoxLayout(w)
@@ -156,18 +169,13 @@ class MainWindow(QMainWindow):
         top = QGroupBox("Zeitraum & Filter")
         tl = QHBoxLayout(top)
 
-        self.start_date = QDateEdit()
-        self.start_date.setCalendarPopup(True)
-        self.end_date = QDateEdit()
-        self.end_date.setCalendarPopup(True)
-        today = datetime.date.today()
-        first = today.replace(day=1)
+        self.start_date = QDateEdit(); self.start_date.setCalendarPopup(True)
+        self.end_date = QDateEdit(); self.end_date.setCalendarPopup(True)
+        today = datetime.date.today(); first = today.replace(day=1)
         self.start_date.setDate(QDate(first.year, first.month, first.day))
         self.end_date.setDate(QDate(today.year, today.month, today.day))
-        tl.addWidget(QLabel("Start:"))
-        tl.addWidget(self.start_date)
-        tl.addWidget(QLabel("Ende:"))
-        tl.addWidget(self.end_date)
+        tl.addWidget(QLabel("Start:")); tl.addWidget(self.start_date)
+        tl.addWidget(QLabel("Ende:")); tl.addWidget(self.end_date)
 
         self.status_only_open = QCheckBox("Nur offene (für Wochentage)")
         tl.addWidget(self.status_only_open)
@@ -184,7 +192,6 @@ class MainWindow(QMainWindow):
         layout.addWidget(top)
 
         analytes = self.ctrl.list_included_analytes() or self.ctrl.list_all_analytes()
-        # >>> alle Analyten vollständig anzeigen (ohne Abschneiden)
         self.wrap_counts, self.scroll_counts, self.chk_analytes_counts = self._make_checkbox_grid(
             analytes, self._cols, show_all=True
         )
@@ -201,11 +208,10 @@ class MainWindow(QMainWindow):
 
         self.model_counts = QStandardItemModel(0, 4, self)
         self.model_counts.setHorizontalHeaderLabels(["Kategorie", "Wert", "Hinweis", "Details"])
-        self.view_counts = QTableView()
-        self.view_counts.setModel(self.model_counts)
+        self.view_counts = QTableView(); self.view_counts.setModel(self.model_counts)
         hdr = self.view_counts.horizontalHeader()
-        hdr.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        hdr.setStretchLastSection(True)
+        hdr.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)  # auto nach Inhalt
+        hdr.setStretchLastSection(False)
         self.view_counts.setAlternatingRowColors(True)
         self.view_counts.setSortingEnabled(False)
         layout.addWidget(self.view_counts)
@@ -258,7 +264,7 @@ class MainWindow(QMainWindow):
 
         self.table_open = QTableWidget(0, 4)
         self.table_open.setHorizontalHeaderLabels(["Analyt (1)", "Offene (1)", "Analyt (2)", "Offene (2)"])
-        self.table_open.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.table_open.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)  # alle gleich breit
         self.table_open.setAlternatingRowColors(True); self.table_open.setSortingEnabled(False)
         layout.addWidget(self.table_open)
         return w
@@ -293,8 +299,8 @@ class MainWindow(QMainWindow):
         self.table_susp = QTableWidget(0, 4)
         self.table_susp.setHorizontalHeaderLabels(["ProbenNr", "Order-Zeit", "Anzahl Anforderungen", "Analyte"])
         hdr = self.table_susp.horizontalHeader()
-        hdr.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        hdr.setStretchLastSection(True)
+        hdr.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)  # auto nach Inhalt
+        hdr.setStretchLastSection(False)
         self.table_susp.setAlternatingRowColors(True)
         self.table_susp.setSortingEnabled(False)
         self.table_susp.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -352,91 +358,179 @@ class MainWindow(QMainWindow):
         except Exception as ex:
             QMessageBox.critical(self, "Fehler", str(ex))
 
-    # ---------- Tab: Singlets
+    # ---------- Tab: Singlets (Top-N, 2 Spaltenpaare, 1er–4er)
     def _build_tab_singlets(self) -> QWidget:
         w = QWidget(); layout = QVBoxLayout(w)
-        line = QHBoxLayout(); line.addWidget(QLabel("Analyse ab Datum:"))
+
+        # Kopfzeile: Datum + Top-N
+        line = QHBoxLayout()
+        line.addWidget(QLabel("Analyse ab Datum:"))
         self.sing_since = QDateEdit(); self.sing_since.setCalendarPopup(True)
         today = datetime.date.today(); first = today.replace(day=1)
         self.sing_since.setDate(QDate(first.year, first.month, first.day))
-        line.addWidget(self.sing_since); btn = QPushButton("Analysieren"); btn.clicked.connect(self._run_singlets); line.addWidget(btn); line.addStretch(1)
+        line.addWidget(self.sing_since)
+
+        line.addSpacing(12)
+        line.addWidget(QLabel("Top N je Bereich:"))
+        self.sing_top = QSpinBox(); self.sing_top.setRange(1, 1000); self.sing_top.setValue(10)
+        line.addWidget(self.sing_top)
+
+        btn = QPushButton("Analysieren"); btn.clicked.connect(self._run_singlets)
+        line.addWidget(btn); line.addStretch(1)
         layout.addLayout(line)
 
-        self.tbl_sing = QTableWidget(0,2); self.tbl_sing.setHorizontalHeaderLabels(["Analyt (Singlet)","Anzahl"])
-        hdr1 = self.tbl_sing.horizontalHeader(); hdr1.setSectionResizeMode(QHeaderView.ResizeMode.Interactive); hdr1.setStretchLastSection(True)
-        self.tbl_sing.setAlternatingRowColors(True); self.tbl_sing.setSortingEnabled(False)
-        layout.addWidget(QLabel("Einzelne offene Analyten (Singlets)")); layout.addWidget(self.tbl_sing)
+        # Helper: Tabelle mit zwei Spaltenpaaren, flexible Breite
+        def make_table():
+            tbl = QTableWidget(0, 4)
+            tbl.setHorizontalHeaderLabels(["Eintrag (1)", "Anzahl (1)", "Eintrag (2)", "Anzahl (2)"])
+            hdr = tbl.horizontalHeader()
+            hdr.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+            hdr.setStretchLastSection(False)
+            tbl.setAlternatingRowColors(True)
+            tbl.setSortingEnabled(False)
+            return tbl
 
-        self.tbl_pairs = QTableWidget(0,2); self.tbl_pairs.setHorizontalHeaderLabels(["Analyt-Kombination (2)","Anzahl"])
-        hdr2 = self.tbl_pairs.horizontalHeader(); hdr2.setSectionResizeMode(QHeaderView.ResizeMode.Interactive); hdr2.setStretchLastSection(True)
-        self.tbl_pairs.setAlternatingRowColors(True); self.tbl_pairs.setSortingEnabled(False)
-        layout.addWidget(QLabel("Häufige 2er-Kombinationen offener Analyten")); layout.addWidget(self.tbl_pairs)
+        # Vier Bereiche: 1er, 2er, 3er, 4er
+        self.tbl_sing = make_table()
+        layout.addWidget(QLabel("Einzelne offene Analyten (Singlets)"))
+        layout.addWidget(self.tbl_sing)
 
-        self.tbl_trips = QTableWidget(0,2); self.tbl_trips.setHorizontalHeaderLabels(["Analyt-Kombination (3)","Anzahl"])
-        hdr3 = self.tbl_trips.horizontalHeader(); hdr3.setSectionResizeMode(QHeaderView.ResizeMode.Interactive); hdr3.setStretchLastSection(True)
-        self.tbl_trips.setAlternatingRowColors(True); self.tbl_trips.setSortingEnabled(False)
-        layout.addWidget(QLabel("Häufige 3er-Kombinationen offener Analyten")); layout.addWidget(self.tbl_trips)
+        self.tbl_pairs = make_table()
+        layout.addWidget(QLabel("Häufige 2er-Kombinationen offener Analyten"))
+        layout.addWidget(self.tbl_pairs)
+
+        self.tbl_trips = make_table()
+        layout.addWidget(QLabel("Häufige 3er-Kombinationen offener Analyten"))
+        layout.addWidget(self.tbl_trips)
+
+        self.tbl_quads = make_table()
+        layout.addWidget(QLabel("Häufige 4er-Kombinationen offener Analyten"))
+        layout.addWidget(self.tbl_quads)
+
         return w
 
     def _run_singlets(self):
         since = datetime.datetime(self.sing_since.date().year(), self.sing_since.date().month(), self.sing_since.date().day())
-        sing, pairs, trips = self.ctrl.combo_stats_since(since)
-        def fill(tbl, rows):
+        top_n = int(self.sing_top.value())
+        sing, pairs, trips, quads = self.ctrl.combo_stats_since(since, top=top_n)
+
+        def fill_pairs_table(tbl: QTableWidget, rows):
             tbl.setUpdatesEnabled(False)
             try:
-                tbl.clearContents(); tbl.setRowCount(0)
-                for k,v in rows:
-                    r = tbl.rowCount(); tbl.insertRow(r)
-                    tbl.setItem(r,0,QTableWidgetItem(str(k))); tbl.setItem(r,1,QTableWidgetItem(str(v)))
+                tbl.clearContents()
+                n_pairs = math.ceil(len(rows) / 2)
+                tbl.setRowCount(n_pairs)
+                for i in range(n_pairs):
+                    # linkes Paar
+                    k1, v1 = rows[2*i]
+                    tbl.setItem(i, 0, QTableWidgetItem(str(k1)))
+                    tbl.setItem(i, 1, QTableWidgetItem(str(v1)))
+                    # rechtes Paar (optional)
+                    if 2*i + 1 < len(rows):
+                        k2, v2 = rows[2*i + 1]
+                        tbl.setItem(i, 2, QTableWidgetItem(str(k2)))
+                        tbl.setItem(i, 3, QTableWidgetItem(str(v2)))
+                    else:
+                        tbl.setItem(i, 2, QTableWidgetItem(""))
+                        tbl.setItem(i, 3, QTableWidgetItem(""))
+
+                # Nach dem Befüllen erneut an Inhalte anpassen
+                hdr = tbl.horizontalHeader()
+                for c in range(4):
+                    hdr.setSectionResizeMode(c, QHeaderView.ResizeMode.ResizeToContents)
             finally:
                 tbl.setUpdatesEnabled(True)
-        fill(self.tbl_sing, sing); fill(self.tbl_pairs, pairs); fill(self.tbl_trips, trips)
 
-    # ---------- Settings
+        fill_pairs_table(self.tbl_sing,  sing)
+        fill_pairs_table(self.tbl_pairs, pairs)
+        fill_pairs_table(self.tbl_trips, trips)
+        fill_pairs_table(self.tbl_quads, quads)
+
+    # ---------- Settings (kompakter Pfade-Bereich via QFormLayout)
     def _build_tab_settings(self) -> QWidget:
-        w = QWidget(); layout = QVBoxLayout(w); layout.setSpacing(8)
+        w = QWidget(); layout = QVBoxLayout(w)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(10)
 
-        gb = QGroupBox("Pfade"); layout.addWidget(gb); gl = QVBoxLayout(gb); gl.setContentsMargins(10,10,10,10); gl.setSpacing(6)
-        def add_row(lbl, line, browse_dir=False, browse_file=False):
-            row = QHBoxLayout(); row.setContentsMargins(0,0,0,0); row.setSpacing(8)
-            row.addWidget(QLabel(lbl)); row.addWidget(line); btn = QPushButton("…")
+        # ----- Pfade ---------------------------------------------------------
+        gb = QGroupBox("Pfade"); layout.addWidget(gb)
+        form = QFormLayout()
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        form.setFormAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        form.setContentsMargins(8, 8, 8, 8)
+        form.setHorizontalSpacing(12)
+        form.setVerticalSpacing(6)
+        gb.setLayout(form)
+
+        def mk_path_row(value: str, *, pick_dir=False, pick_file=False) -> QtWidgets.QWidget:
+            line = QtWidgets.QLineEdit(value)
+            btn = QPushButton("…"); btn.setFixedWidth(28)
+            row = QWidget()
+            h = QHBoxLayout(row)
+            h.setContentsMargins(0, 0, 0, 0)
+            h.setSpacing(6)
+            h.addWidget(line, 1)
+            h.addWidget(btn, 0)
+
             def choose():
-                if browse_dir: p = QFileDialog.getExistingDirectory(self,"Ordner wählen",os.getcwd())
-                elif browse_file: p, _ = QFileDialog.getOpenFileName(self,"Datei wählen",os.getcwd())
-                else: p = ""
-                if p: line.setText(p)
-            btn.clicked.connect(choose); row.addWidget(btn); gl.addLayout(row)
+                p = ""
+                if pick_dir:
+                    p = QFileDialog.getExistingDirectory(self, "Ordner wählen", os.getcwd())
+                elif pick_file:
+                    p, _ = QFileDialog.getOpenFileName(self, "Datei wählen", os.getcwd())
+                if p:
+                    line.setText(p)
 
-        self.le_db = QtWidgets.QLineEdit(self.ctrl.paths.get("database_path",""))
-        self.le_excel = QtWidgets.QLineEdit(self.ctrl.paths.get("excel_file",""))
-        self.le_export = QtWidgets.QLineEdit(self.ctrl.paths.get("export_dir",""))
-        add_row("Datenbank:", self.le_db, browse_file=True)
-        add_row("Excel:", self.le_excel, browse_file=True)
-        add_row("Export-Ordner:", self.le_export, browse_dir=True)
+            btn.clicked.connect(choose)
+            return row, line
 
-        gf = QGroupBox("Analyten-Filter (Häkchen = aus Suche ausschließen)"); layout.addWidget(gf)
-        v = QVBoxLayout(gf); v.setContentsMargins(10,10,10,10); v.setSpacing(6); self.filter_layout = v
+        row_db, self.le_db = mk_path_row(self.ctrl.paths.get("database_path", ""), pick_file=True)
+        row_xl, self.le_excel = mk_path_row(self.ctrl.paths.get("excel_file", ""), pick_file=True)
+        row_ex, self.le_export = mk_path_row(self.ctrl.paths.get("export_dir", ""), pick_dir=True)
 
-        info = QHBoxLayout(); info.setContentsMargins(0,0,0,0); info.setSpacing(8)
+        form.addRow("Datenbank:", row_db)
+        form.addRow("Excel (Audit):", row_xl)
+        form.addRow("Export-Ordner:", row_ex)
+
+        # ----- Analyten-Filter ----------------------------------------------
+        gf = QGroupBox("Analyten-Filter (Häkchen = aus Suche ausschließen)")
+        layout.addWidget(gf)
+        v = QVBoxLayout(gf)
+        v.setContentsMargins(8, 8, 8, 8)
+        v.setSpacing(8)
+        self.filter_layout = v
+
+        info = QHBoxLayout()
+        info.setContentsMargins(0, 0, 0, 0)
+        info.setSpacing(8)
         info.addWidget(QLabel("Liste aus Datenbank (BefTag.TestKB)."))
         btn_reload = QPushButton("Neu laden"); btn_reload.clicked.connect(self._reload_filter_list)
-        info.addWidget(btn_reload); info.addStretch(1); v.addLayout(info)
+        info.addWidget(btn_reload); info.addStretch(1)
+        v.addLayout(info)
 
         analytes = self.ctrl.list_all_analytes()
         self.wrap_filter, self.scroll_filter, self.chk_filter = self._make_checkbox_grid(analytes, self._cols)
         v.addWidget(self.wrap_filter)
 
         excluded = set(self.ctrl.get_excluded_analytes())
-        for cb in self.chk_filter: cb.setChecked(cb.text() in excluded)
+        for cb in self.chk_filter:
+            cb.setChecked(cb.text() in excluded)
 
-        btns = QHBoxLayout(); btns.setContentsMargins(0,0,0,0); btns.setSpacing(8)
-        btn_all = QPushButton("Alle ausschließen"); btn_none = QPushButton("Alle einschließen")
+        btns = QHBoxLayout()
+        btns.setContentsMargins(0, 0, 0, 0)
+        btns.setSpacing(8)
+        btn_all = QPushButton("Alle ausschließen")
+        btn_none = QPushButton("Alle einschließen")
         btn_all.clicked.connect(lambda: [cb.setChecked(True) for cb in self.chk_filter if cb.isVisible()])
         btn_none.clicked.connect(lambda: [cb.setChecked(False) for cb in self.chk_filter if cb.isVisible()])
-        btns.addWidget(btn_all); btns.addWidget(btn_none); btns.addStretch(1); v.addLayout(btns)
+        btns.addWidget(btn_all); btns.addWidget(btn_none); btns.addStretch(1)
+        v.addLayout(btns)
 
-        btn_save = QPushButton("Einstellungen speichern"); btn_save.clicked.connect(self._save_settings)
+        # ----- Speichern -----------------------------------------------------
+        btn_save = QPushButton("Einstellungen speichern")
+        btn_save.clicked.connect(self._save_settings)
         layout.addWidget(btn_save)
+
         return w
 
     def _reload_filter_list(self):
@@ -445,7 +539,8 @@ class MainWindow(QMainWindow):
         self.wrap_filter, self.scroll_filter, self.chk_filter = self._make_checkbox_grid(analytes, self._cols)
         self.filter_layout.insertWidget(1, self.wrap_filter)
         excluded = set(self.ctrl.get_excluded_analytes())
-        for cb in self.chk_filter: cb.setChecked(cb.text() in excluded)
+        for cb in self.chk_filter:
+            cb.setChecked(cb.text() in excluded)
 
     def _reload_analyte_controls(self):
         analytes = self.ctrl.list_included_analytes() or self.ctrl.list_all_analytes()
@@ -469,7 +564,10 @@ class MainWindow(QMainWindow):
         excluded = [cb.text() for cb in self.chk_filter if cb.isChecked()]
         self.ctrl.update_excluded_analytes(excluded)
         self.ctrl.save_settings()
-        QtWidgets.QMessageBox.information(self, "Gespeichert", "Einstellungen gespeichert. Über „Analyten aktualisieren“ die Listen neu laden.")
+        QtWidgets.QMessageBox.information(
+            self, "Gespeichert",
+            "Einstellungen gespeichert. Über „Analyten aktualisieren“ die Listen neu laden."
+        )
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

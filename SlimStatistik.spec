@@ -1,9 +1,9 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('resources/style.qss', 'resources'), ('config/mapping.json', 'config')]
+datas = [('resources\\style.qss', 'resources')]
 binaries = []
-hiddenimports = []
+hiddenimports = ['openpyxl', 'sqlite3']
 tmp_ret = collect_all('PyQt6')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 

@@ -7,6 +7,9 @@ from models.repository import Repository
 
 
 class MainController:
+    """
+    Application-LOGIC (Use-Cases). Kein UI, kein SQL – nur Domänenlogik.
+    """
     def __init__(self, settings_path: Optional[str] = None, mapping_path: Optional[str] = None):
         self.settings_path = settings_path or os.path.join("config", "settings.ini")
         os.makedirs(os.path.dirname(self.settings_path), exist_ok=True)
@@ -15,6 +18,7 @@ class MainController:
         if os.path.exists(self.settings_path):
             cfg.read(self.settings_path, encoding="utf-8")
 
+        # Default-Pfade
         self.paths: Dict[str, str] = {
             "database_path": "",
             "excel_file": os.path.join("export", "DeletedSuspects.xlsx"),
@@ -23,6 +27,7 @@ class MainController:
         if "paths" in cfg:
             self.paths.update(cfg["paths"])
 
+        # Analyten-Filter (aus Suche ausschließen)
         self._excluded = set()
         if "filters" in cfg:
             ex = cfg["filters"].get("exclude_analytes", "")
@@ -58,7 +63,7 @@ class MainController:
         all_codes = set(self.list_all_analytes())
         return sorted([a for a in all_codes if a not in self._excluded])
 
-    # ---------------------- Monats-Export (Hook)
+    # ---------------------- Monats-Export (Hook – aktuell als Platzhalter)
     def monthly_export_if_first(self) -> None:
         return
 
@@ -147,12 +152,10 @@ class MainController:
         last_row = ws.max_row
         last_col = len(headers)
         if last_row < 2:
-            # Noch keine Daten -> ggf. vorhandene Tabelle ignorieren
             return
 
         ref = f"A1:{get_column_letter(last_col)}{last_row}"
 
-        # openpyxl>=3.1: ws.tables ist dict{name: Table}
         if table_name in ws.tables:
             t = ws.tables[table_name]
             t.ref = ref
@@ -217,9 +220,11 @@ class MainController:
 
     # === Delete-APIs ==========================================================
     def delete_sample_with_audit(self, proben_nr: str) -> int:
+        """Einzelner Datensatz (Kompatibilität)."""
         return self.delete_samples_with_audit([proben_nr])
 
     def delete_samples_with_audit(self, proben_nrs: List[str]) -> int:
+        """Loggt ALLE gegebenen Proben und löscht sie danach."""
         infos = []
         for pnr in proben_nrs:
             info = self.repo.get_sample_audit_info(pnr)
@@ -230,11 +235,20 @@ class MainController:
         return self.repo.delete_samples(proben_nrs)
 
     # ---------------------- Singlets / Kombinationen
-    def combo_stats_since(self, since: dt.datetime):
+    def combo_stats_since(self, since: dt.datetime, top: int = 10):
+        """
+        Top-N für EXAKTE offene Matrizen:
+          - 1er nur bei genau 1 offenem Analyt
+          - 2er/3er/4er nur bei genau 2/3/4 offenen Analyten
+        """
         s = since.strftime("%Y-%m-%d %H:%M:%S")
-        singles, pairs, trips = self.repo.open_combo_stats(s)
+        # KEIN excluded hier – wir wollen die echte offene Matrix, nicht gefiltert
+        singles, pairs, trips, quads = self.repo.open_combo_stats(s, excluded=None, max_k=4)
 
         def sort_desc(d: Dict) -> List[Tuple[str, int]]:
             return sorted(d.items(), key=lambda x: (-x[1], x[0]))
 
-        return sort_desc(singles), sort_desc(pairs), sort_desc(trips)
+        srt1, srt2, srt3, srt4 = map(sort_desc, (singles, pairs, trips, quads))
+        if top and top > 0:
+            srt1, srt2, srt3, srt4 = srt1[:top], srt2[:top], srt3[:top], srt4[:top]
+        return srt1, srt2, srt3, srt4

@@ -4,14 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="41dc77e7-c055-43a5-9d45-d92e9c0abb6a" name="Changes" comment="20251015_1">
-      <change afterPath="$PROJECT_DIR$/logic/audit_service.py" afterDir="false" />
+    <list default="true" id="41dc77e7-c055-43a5-9d45-d92e9c0abb6a" name="Changes" comment="20251015_2 works">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/settings.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SlimStatistik.spec" beforeDir="false" afterPath="$PROJECT_DIR$/SlimStatistik.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controller/main_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/controller/main_controller.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic/stats_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/logic/stats_service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/repository.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/style.qss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/style.qss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/main_window.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/main_window.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,18 +27,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "layzieshin"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;layzieshin&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/layzieshin/SlimStatistik.git",
-    "accountId": "d6c5f587-079e-411b-9c64-856bacc9c6b6"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/layzieshin/SlimStatistik.git&quot;,
+    &quot;accountId&quot;: &quot;d6c5f587-079e-411b-9c64-856bacc9c6b6&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -115,24 +113,33 @@
       <option name="project" value="LOCAL" />
       <updated>1760559494900</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="20251015_2 works">
+      <option name="closed" value="true" />
+      <created>1760571522325</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1760571522325</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="20251015_1" />
-    <option name="LAST_COMMIT_MESSAGE" value="20251015_1" />
+    <MESSAGE value="20251015_2 works" />
+    <option name="LAST_COMMIT_MESSAGE" value="20251015_2 works" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/repository.py</url>
-          <line>36</line>
+          <line>37</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/ui/main_window.py</url>
-          <line>151</line>
+          <line>77</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
